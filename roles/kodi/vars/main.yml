@@ -1,0 +1,5 @@
+---
+# vars file for kodi
+
+kodi_user: 'kodi'
+kodi_groups: ''

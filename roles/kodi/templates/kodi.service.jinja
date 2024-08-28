@@ -1,0 +1,25 @@
+
+[Unit]
+Description=Kodi (Standalone/GBM)
+Wants=network-online.target polkit.service upower.service
+Conflicts=getty@tty1.service
+After=network-online.target polkit.service upower.service sound.target bluetooth.target  \
+         systemd-user-sessions.service 
+
+[Service]
+User=kodi
+Group=kodi
+EnvironmentFile=-/etc/default/kodi
+PAMName=login
+TTYPath=/dev/tty1
+ExecStart=/usr/lib/arm-linux-gnueabihf/kodi/kodi.bin --standalone
+#ExecStartPost=echo "Update Firewall Rules"
+#ExecStartPost=+/usr/local/sbin/ufw-addon-kodi start check
+ExecStop=/usr/bin/killall --user kodi --exact --wait kodi.bin
+Restart=on-abort
+StandardInput=tty
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target
+Alias=kodi-standalone.service

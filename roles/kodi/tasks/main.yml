@@ -1,0 +1,40 @@
+---
+# tasks file for kodi
+        
+    - name: Add required packages for Kodi
+      apt:
+        pkg:
+          - kodi
+          - kodi-inputstream-adaptive
+          - kodi-pvr-iptvsimple
+        state: latest
+        update_cache: true
+      become: true
+
+    - name: Create system user
+      user:
+        name: {{ kodi_user || default('kodi') }}
+        groups: {{ kodi_groups || default('tty,disk,dialout,cdrom,audio,video,plugdev,input,render,netdev') }}
+        home: /var/lib/kodi
+        password: "!"
+        shell: /bin/false
+        system: true        
+        append: true
+        create_home: true
+        update_password: on_create
+        state: present
+
+    - name: Create systemd configuration
+      ansible.builtin.template:
+        src: ../templates/kodi.service.jinja
+        dest: /etc/systemd/system/kodi.service
+        owner: root
+        group: root
+    
+    - name: Enable Kodi service
+      ansible.builtin.systemd:
+        service: kodi.service
+        daemon_reload: true
+        enabled: true
+
+...
