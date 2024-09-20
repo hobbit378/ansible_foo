@@ -1,0 +1,26 @@
+---
+# defaults file for basic_setup
+
+timezone: "Europe/Berlin"
+
+additional_packages:
+  - less 
+  - vim 
+  - curl 
+  - wget 
+  - rsync 
+  - rclone 
+  - git 
+  - tmux 
+  - mc 
+
+cap_ufw: yes
+
+unattended_upgrades_autoupdate_enabled: true
+unattended_upgrades_autoupdate_reboot: false
+unattended_upgrades_autoupdate_reboot_time: "03:33"
+
+ssh_port: 22
+ssh_pwdless: yes
+
+fail2ban_enabled: true

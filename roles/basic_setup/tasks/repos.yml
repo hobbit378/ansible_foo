@@ -1,7 +1,0 @@
----
-
-    - name: Clone git repo(s)
-      ansible.builtin.git:
-        repo: "{{ item.repo }}"
-        dest: "{{ item.dest }}"        
-      loop: "{{ git_repos }}"

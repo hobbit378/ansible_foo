@@ -1,0 +1,37 @@
+---
+# tasks file for sudo
+
+# sudo authentication via ssh key
+
+  - name: Add PAM ssh-agent auth module
+    ansible.builtin.package:
+      name:
+        - libpam-ssh-agent-auth
+      state: present
+
+  - name: Add PAM ssh-agent auth for sudo 
+    ansible.builtin.lineinfile:
+      state: present
+      path: /etc/pam.d/sudo
+      insertbefore: 'common-auth'
+      regexp: 'pam_ssh_agent_auth.so'
+      line:  'auth    sufficient     pam_ssh_agent_auth.so file=%h/.ssh/authorized_keys'
+  
+# configure sudo  
+
+  - name: Configure sudo
+    community.general.sudoers:
+      name: "{{ item.name }}"
+      user: "{{ item.user | default(omit) }}"
+      group: "{{ item.group | default(omit) }}"
+      commands: "{{ item.commands | default('ALL') }}"
+      host: "{{ item.host | default(omit) }}"
+      noexec: "{{ item.noexec | default(omit) }}"
+      nopassword: "{{ item.nopassword | default(omit) }}"
+      runas: "{{ item.runas | default(omit) }}"
+      setenv: "{{ item.setenv | default(omit) }}"
+      state: "{{ item.state | default(omit) }}"
+      sudoers_path: "{{ item.sudoers_path | default(omit) }}"
+      validation: "{{ item.validation | default(omit) }}"
+    loop: "{{ sudo_units }}"
+    when: sudo_units is defined 

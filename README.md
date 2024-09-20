@@ -1,3 +1,3 @@
-# Ansible Collection - hobbit378.ansible_foo
+# Ansible Collection - hobbit378.system
 
 Documentation for the collection.

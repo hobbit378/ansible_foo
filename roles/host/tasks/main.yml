@@ -1,0 +1,51 @@
+---
+# tasks file for host_setup
+
+# roles:
+#   - vadgh.system.common
+#   - gerlingguy.swap
+#   - hobbit378.system.sudo (self-reference)
+
+  - name: Set Hostname
+    ansible.builtin.hostname:
+      name: "{{ hostname }}"
+    when: hostname is defined
+  
+  - name: Run Basic Setup
+    ansible.builtin.import_role:
+      name: vladgh.system.common
+  
+  - name: Configure Firewall
+    ansible.builtin.import_role:
+      name: vladgh.system.common
+    when: cap_ufw
+
+  - name: Deactivate SSH password access
+    ansible.builtin.lineinfile:
+      state: present
+      path: /etc/ssh/sshd_config
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+    loop:
+      - regexp: "^#PORT" 
+        line: "PORT {{ ssh_port | mandatory }}"
+      - regexp: "^#?PermitRootLogin"
+        line: "PermitRootLogin no"
+      - regexp: "^#?PasswordAuthentication"
+        line: "PasswordAuthentication no"
+    when: ssh_pwdless
+
+  - name: Adjust sudo access and authentication
+    ansible.builtin.import_role:
+      name: sudo
+  
+  - name: Allocate swap space
+    ansible.builtin.import_role:
+      name: geerlingguy.swap
+
+  - name: Enable and retrieve podman images and git repos
+    ansible.builtin.import_role:
+      name: retrieve
+
+
+

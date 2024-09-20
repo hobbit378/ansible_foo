@@ -1,0 +1,39 @@
+---
+
+  - name: UFW - Install ufw package
+    ansible.builtin.package:
+      name: [ 'ufw ']
+      state: present
+    when: cap_ufw
+
+
+  - name: UFW - (STEP 1) Configure Rules
+    community.general.ufw:
+      app: {{ item.app | defaul(omit) }}
+      comment: {{ item.comment | defaul(omit) }}
+      rule: {{ item.rule | defaul(omit) }}
+      direction: {{ item.direction | defaul(omit) }}
+      proto: {{ item.proto | defaul(omit) }}
+      from_ip: {{ item.from_ip | defaul(omit) }}
+      to_ip: {{ item.to_ip | defaul(omit) }}
+      from_port: {{ item.from_port | defaul(omit) }}
+      to_port: {{ item.to_port | defaul(omit) }}
+      if: {{ item.if | defaul(omit) }}
+      if_in: {{ item.if_in | defaul(omit) }}
+      if_out: {{ item.if_out | defaul(omit) }}
+      log: {{ item.log | defaul(omit) }}
+    loop: "{{ ufw_rules }}"
+    when: cap_ufw
+
+  - name: UFW - (STEP 2) Enable Firewall
+    community.general.ufw:
+      direction: incoming
+      default: deny
+      state: enabled
+      logging: medium
+    when: cap_ufw
+ 
+  - name: "FWKNOPD - Setup & Configure"
+    ansible.builtin.import_role: 
+      name: roguh.fwknop
+    when: cap_fwknopd and fwknopd_rules is defined

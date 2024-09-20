@@ -1,0 +1,40 @@
+---
+# tasks file for retrieve
+
+
+    - name: Install Git
+      ansible.builtin.package:
+        name:
+          - 'podman'
+          - 'podman-toolbox'
+          - 'podman-compose'
+        state: "{{ cap_podman }}"
+      when: cap_git | default('present') is defined
+
+    - name: Clone git repo(s) to selected destinations
+      ansible.builtin.git:
+        repo: "{{ item.repo }}"
+        dest: "{{ item.dest }}"        
+        clone: "{{ item.clone | default(omit) }}"
+        update: "{{ item.update | default(omit) }}"
+        depth: "{{ item.depth | default(omit) }}"
+        recursive: "{{ item.recursive | default(omit) }}"
+        single_branch: "{{ item.single_branch | default(omit) }}"
+      loop: "{{ git_repos }}"
+      when: git_repos is defined and cap_git == 'present'
+
+    - name: Install Podman
+      ansible.builtin.package:
+        name:
+          - 'podman'
+          - 'podman-toolbox'
+          - 'podman-compose'
+        state: "{{ cap_podman }}"
+      when: cap_podman is defined
+
+    - name: Pull Podman containers
+      ansible.builtin.command:
+        sudo -u {{ item.user }} podman pull {{ item.image }}
+      loop: "{{ podman_images }}"
+      when: podman_images is defined and cap_podman == 'present'
+   
